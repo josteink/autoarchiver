@@ -87,7 +87,7 @@ def scan_document():
     import tempfile
 
     # scan original
-    scanned = tempfile.mkstemp(suffix=".tiff")
+    fid, scanned = tempfile.mkstemp(suffix=".tiff")
     open_silently([
         "scanimage", "--resolution=300", "--format=tiff", scanned
     ], "Error attempting to scan document.")
