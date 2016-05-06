@@ -80,7 +80,7 @@ def open_silently(command, error_message, custom_stdin=None):
     output = proc.stdout.read()
     retcode = proc.wait()
     if retcode is not 0:
-        raise Exception(error_message + ":\n" + output)
+        raise Exception((error_message + ":\n%r") % output)
 
 
 def scan_document():
