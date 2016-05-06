@@ -111,7 +111,7 @@ def ocr_document(source):
     # OCR scanned document
     fid, tesseract_txt = tempfile.mkstemp(suffix=".txt")
     # automatically created by tesseract!
-    tesseract_html = tesseract_txt.replace(".txt", ".html")
+    tesseract_html = tesseract_txt + ".html"
     open_silently([
         "tesseract", tesseract_source, tesseract_txt,
         "-l", "nor", "hocr"
