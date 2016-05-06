@@ -119,7 +119,7 @@ def ocr_document(source):
 
     # combine source TIFF and ocr data to PDF
     fid, pdf = tempfile.mkstemp(suffix=".pdf")
-    with open(tesseract_html, "r") as f:
+    with open(tesseract_html, "rb") as f:
         html = f.read()
         open_silently([
             "hocr2pdf", "-r", "-150", "-i", tesseract_source,
