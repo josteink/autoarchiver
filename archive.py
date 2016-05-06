@@ -101,7 +101,11 @@ def ocr_document(source):
     fid, tesseract_source = tempfile.mkstemp(suffix=".tiff")
     open_silently([
         "convert", "-quiet", "-density", "150", "-depth", "8",
-        "-colorspace", "Gray", source, tesseract_source
+        "-colorspace", "Gray",
+        # avoid alpha channel. required so that processed PDFs can be
+        # processed by leptonica and tesseract.
+        "-background", "white", "-flatten", "+matte",
+        source, tesseract_source
     ], "Error preparing scanned document for tesseract.")
 
     # OCR scanned document
