@@ -113,22 +113,24 @@ def ocr_document(source, txt_only=False):
     ], "Error preparing scanned document for tesseract.")
 
     # OCR scanned document
-    fid, tesseract_txt = tempfile.mkstemp(suffix=".txt")
+    fid, tesseract_base = tempfile.mkstemp()
+    tesseract_txt = tesseract_base + ".txt"
 
     # create TXT
     open_silently([
-        "tesseract", tesseract_source, tesseract_txt,
+        "tesseract", tesseract_source, tesseract_base,
         "-l", "nor"
     ], "Error processing document with tesseract.")
 
     if txt_only:
         os.unlink(tesseract_source)
+        os.unlink(tesseract_base)
         return (None, tesseract_txt)
 
     # create HTML
-    tesseract_html = tesseract_txt + ".html"
+    tesseract_html = tesseract_base + ".html"
     open_silently([
-        "tesseract", tesseract_source, tesseract_txt,
+        "tesseract", tesseract_source, tesseract_base,
         "-l", "nor", "hocr"
     ], "Error processing document with tesseract.")
 
@@ -143,6 +145,7 @@ def ocr_document(source, txt_only=False):
 
     # remove temp-files
     os.unlink(tesseract_source)
+    os.unlink(tesseract_base)
     os.unlink(tesseract_html)
 
     return (pdf, tesseract_txt)
