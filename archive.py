@@ -64,7 +64,7 @@ def get_tags(tags):
 def open_silently(command, error_message, custom_stdin=None):
     import subprocess
 
-    print("Exec: %r" % command)
+    print("Exec: " + " ".join(command))
 
     stdin_value = None
     if custom_stdin:
@@ -104,7 +104,7 @@ def ocr_document(source, txt_only=False):
     # preprocess for OCR
     fid, tesseract_source = tempfile.mkstemp(suffix=".tiff")
     open_silently([
-        "convert", "-quiet", "-density", "150", "-depth", "8",
+        "convert", "-quiet", "-density", "300", "-depth", "8",
         "-colorspace", "Gray",
         # avoid alpha channel. required so that processed PDFs can be
         # processed by leptonica and tesseract.
@@ -137,7 +137,7 @@ def ocr_document(source, txt_only=False):
     with open(tesseract_html, "rb") as f:
         html = f.read()
         open_silently([
-            "hocr2pdf", "-r", "-150", "-i", tesseract_source,
+            "hocr2pdf", "-r", "-300", "-i", tesseract_source,
             "-o", pdf
         ], "Errror processing document!", custom_stdin=html)
 
@@ -154,7 +154,8 @@ def archive(pdf, txt, date, args):
 
 def delete_files(files):
     for file in files:
-        os.unlink(file)
+        print("Not deleting: %r" % file)
+        #os.unlink(file)
 
 
 def main():
