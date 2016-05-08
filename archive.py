@@ -138,7 +138,7 @@ def ocr_document(source):
 
 
 def archive(pdf, txt, date, args):
-    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % pdf, txt, date, args)
+    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, args))
 
 
 def delete_files(files):
