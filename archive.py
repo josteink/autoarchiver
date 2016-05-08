@@ -57,11 +57,15 @@ def get_date_from_string(string):
     return None
 
 
+def get_tags(tags):
+    return tags or ["Ukategorisert"]
+
+
 def open_silently(command, error_message, custom_stdin=None):
     import subprocess
 
     print("Exec: %r" % command)
-    
+
     stdin_value = None
     if custom_stdin:
         stdin_value = subprocess.PIPE
@@ -130,23 +134,16 @@ def ocr_document(source):
     os.unlink(tesseract_source)
     os.unlink(tesseract_html)
 
-    return [pdf, tesseract_txt]
+    return (pdf, tesseract_txt)
 
 
-def process(filename, date, tags):
-    filename = os.path.expanduser(filename)
-    if not os.path.isfile(filename):
-        raise Exception(
-            "Cannot process file: '{0}'. File not found!".format(filename)
-        )
+def archive(pdf, txt, date, args):
+    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % pdf, txt, date, args)
 
-    # print("Processing file '{0}' with date '{1}' and tags {2}".format(
-    #     filename, datetime.datetime.strftime(date), tags
-    # ))
 
-    # [pdf,txt] = ocr_document(filename)
-    res = ocr_document(filename)
-    print("%r" % res)
+def delete_files(files):
+    for file in files:
+        os.unlink(file)
 
 
 def main():
@@ -159,18 +156,36 @@ def main():
     args = p.parse_args()
 
     date = get_date_from_string(args.date)
+    tags = get_tags(args.tags)
     filename = args.file
-    scanned = False
 
     if filename is None:
+        # scan, OCR to TXT and create PDF
         filename = scan_document()
-        scanned = True
+        pdf, txt = ocr_document(filename)
+        archive(pdf, txt, date, tags)
+        delete_files([filename, pdf, txt])
+        return
 
-    process(filename, date, args.tags)
+    else:
+        # validate
+        filename = os.path.expanduser(filename)
+        if not os.path.isfile(filename):
+            raise Exception(
+                "Cannot process file: '{0}'. File not found!".format(filename)
+            )
 
-    # delete our temporary copy
-    if scanned:
-        os.unlink(filename)
+        base, ext = os.path.splitext(filename)
+        if ext.lower() == ".pdf":
+            # create TXT index, but archive PDF as is.
+            pdf, txt = ocr_document(filename)
+            archive(filename, txt, date, tags)
+            delete_files([pdf, txt])
+        else:
+            # OCR to TXT, and create PDF
+            pdf, txt = ocr_document(filename)
+            archive(pdf, txt, date, tags)
+            delete_files([pdf, txt])
 
 
 if __name__ == "__main__":
