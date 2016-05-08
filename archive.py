@@ -98,7 +98,7 @@ def scan_document():
     return scanned
 
 
-def ocr_document(source):
+def ocr_document(source, txt_only=False):
     import tempfile
 
     # preprocess for OCR
@@ -114,7 +114,18 @@ def ocr_document(source):
 
     # OCR scanned document
     fid, tesseract_txt = tempfile.mkstemp(suffix=".txt")
-    # automatically created by tesseract!
+
+    # create TXT
+    open_silently([
+        "tesseract", tesseract_source, tesseract_txt,
+        "-l", "nor"
+    ], "Error processing document with tesseract.")
+
+    if txt_only:
+        os.unlink(tesseract_source)
+        return (None, tesseract_txt)
+
+    # create HTML
     tesseract_html = tesseract_txt + ".html"
     open_silently([
         "tesseract", tesseract_source, tesseract_txt,
@@ -178,9 +189,10 @@ def main():
         base, ext = os.path.splitext(filename)
         if ext.lower() == ".pdf":
             # create TXT index, but archive PDF as is.
-            pdf, txt = ocr_document(filename)
+            # TODO: use pandoc or something better for this,
+            _, txt = ocr_document(filename, txt_only=True)
             archive(filename, txt, date, tags)
-            delete_files([pdf, txt])
+            delete_files([txt])
         else:
             # OCR to TXT, and create PDF
             pdf, txt = ocr_document(filename)
