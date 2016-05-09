@@ -100,9 +100,11 @@ def scan_document():
 
 def ocr_document(source, txt_only=False):
     import tempfile
+    fid, temp_base = tempfile.mkstemp(prefix="ocr_")
+    os.unlink(temp_base)
 
     # preprocess for OCR
-    fid, tesseract_source = tempfile.mkstemp(suffix=".tiff")
+    tesseract_source = temp_base + ".tiff"
     open_silently([
         "convert", "-quiet", "-density", "300", "-depth", "8",
         "-colorspace", "Gray",
@@ -113,40 +115,35 @@ def ocr_document(source, txt_only=False):
     ], "Error preparing scanned document for tesseract.")
 
     # OCR scanned document
-    fid, tesseract_base = tempfile.mkstemp()
-    tesseract_txt = tesseract_base + ".txt"
+    tesseract_txt = temp_base + ".txt"
 
     # create TXT
     open_silently([
-        "tesseract", tesseract_source, tesseract_base,
+        "tesseract", tesseract_source, temp_base,
         "-l", "nor"
     ], "Error processing document with tesseract.")
 
     if txt_only:
-        os.unlink(tesseract_source)
-        os.unlink(tesseract_base)
         return (None, tesseract_txt)
 
     # create HTML
-    tesseract_html = tesseract_base + ".html"
+    tesseract_html = temp_base + ".html"
     open_silently([
-        "tesseract", tesseract_source, tesseract_base,
+        "tesseract", tesseract_source, temp_base,
         "-l", "nor", "hocr"
     ], "Error processing document with tesseract.")
 
     # combine source TIFF and ocr data to PDF
-    fid, pdf = tempfile.mkstemp(suffix=".pdf")
+    pdf = temp_base + ".pdf"
     with open(tesseract_html, "rb") as f:
         html = f.read()
         open_silently([
-            "hocr2pdf", "-r", "-300", "-i", tesseract_source,
+            "hocr2pdf", "-r", "-300", "-i", source,
             "-o", pdf
         ], "Errror processing document!", custom_stdin=html)
 
-    # remove temp-files
-    os.unlink(tesseract_source)
-    os.unlink(tesseract_base)
-    os.unlink(tesseract_html)
+    # remove temp-file
+    delete_files([tesseract_source, tesseract_html])
 
     return (pdf, tesseract_txt)
 
