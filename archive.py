@@ -217,9 +217,7 @@ def archive(pdf, txt, date, tags):
 
     # print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, tags))
 
-    date_part = "{0}/{1:02d}/{2:02d}".format(
-        date.year, date.month, date.day
-    )
+    date_part = format_date(date)
     tags_part = " ".join(tags)
     path = os.path.join(os.path.expanduser(basepath), date_part, tags_part)
 
