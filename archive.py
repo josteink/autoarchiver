@@ -5,7 +5,7 @@ import datetime
 
 # settings
 dpi = 300
-
+basepath = "~/DocumentArchive"
 
 def get_date_from_parts(year, month, day):
     [iyear, imonth, iday] = map(int, [
@@ -152,8 +152,30 @@ def ocr_document(source, txt_only=False):
     return (pdf, tesseract_txt)
 
 
-def archive(pdf, txt, date, args):
-    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, args))
+def archive(pdf, txt, date, tags):
+    from shutil import copy
+
+    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, tags))
+
+    date_part = "{0}/{1:02d}/{2:02d}".format(
+        date.year, date.month, date.day
+    )
+    tags_part = " ".join(tags)
+    path = os.path.join(os.path.expanduser(basepath), date_part, tags_part)
+
+    if os.path.isdir(path):
+        num = 2
+        template = path + " ({0})"
+        while True:
+            path = template.format(num)
+            if not os.path.isdir(path):
+                break
+            num += 1
+
+    # create target dir and archive
+    os.makedirs(path)
+    copy(pdf, path)
+    copy(txt, path)
 
 
 def delete_files(files):
