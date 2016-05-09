@@ -118,7 +118,7 @@ def get_date_for_file(pdf, txt):
 def open_silently(command, error_message, custom_stdin=None):
     import subprocess
 
-    print("Exec: " + " ".join(command))
+    # print("Exec: " + " ".join(command))
 
     stdin_value = None
     if custom_stdin:
@@ -145,6 +145,7 @@ def scan_document():
     import tempfile
 
     # scan original
+    print("Scanning...")
     fid, scanned = tempfile.mkstemp(suffix=".tiff")
     open_silently([
         "scanimage", "--resolution=" + str(dpi), "--format=tiff", scanned
@@ -158,6 +159,7 @@ def ocr_document(source, txt_only=False):
     os.unlink(temp_base)
 
     # preprocess for OCR
+    print("Preparing for OCR...")
     tesseract_source = temp_base + ".tiff"
     open_silently([
         "convert", "-quiet", "-density", str(dpi), "-depth", "8",
@@ -172,6 +174,7 @@ def ocr_document(source, txt_only=False):
     tesseract_txt = temp_base + ".txt"
 
     # create TXT
+    print("OCRing...")
     open_silently([
         "tesseract", tesseract_source, temp_base,
         "-l", "nor"
@@ -189,6 +192,7 @@ def ocr_document(source, txt_only=False):
     ], "Error processing document with tesseract.")
 
     # combine source TIFF and ocr data to PDF
+    print("Creating PDF...")
     pdf = temp_base + ".pdf"
     with open(tesseract_html, "rb") as f:
         html = f.read()
@@ -205,6 +209,8 @@ def ocr_document(source, txt_only=False):
 
 def archive(pdf, txt, date, tags):
     from shutil import copy
+
+    print("Archiving...")
 
     if date is None:
         date = get_date_for_file(pdf, txt)
