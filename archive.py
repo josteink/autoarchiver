@@ -3,6 +3,9 @@
 import os
 import datetime
 
+# settings
+dpi = 300
+
 
 def get_date_from_parts(year, month, day):
     [iyear, imonth, iday] = map(int, [
@@ -93,7 +96,7 @@ def scan_document():
     # scan original
     fid, scanned = tempfile.mkstemp(suffix=".tiff")
     open_silently([
-        "scanimage", "--resolution=300", "--format=tiff", scanned
+        "scanimage", "--resolution=" + str(dpi), "--format=tiff", scanned
     ], "Error attempting to scan document.")
     return scanned
 
@@ -106,7 +109,7 @@ def ocr_document(source, txt_only=False):
     # preprocess for OCR
     tesseract_source = temp_base + ".tiff"
     open_silently([
-        "convert", "-quiet", "-density", "300", "-depth", "8",
+        "convert", "-quiet", "-density", dpi, "-depth", "8",
         "-colorspace", "Gray",
         # avoid alpha channel. required so that processed PDFs can be
         # processed by leptonica and tesseract.
@@ -138,7 +141,7 @@ def ocr_document(source, txt_only=False):
     with open(tesseract_html, "rb") as f:
         html = f.read()
         open_silently([
-            "hocr2pdf", "-r", "-300", "-i", source,
+            "hocr2pdf", "-r", "-" + str(dpi), "-i", source,
             "-o", pdf
         ], "Errror processing document!", custom_stdin=html)
 
