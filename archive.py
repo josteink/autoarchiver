@@ -127,6 +127,7 @@ def ocr_document(source, txt_only=False):
     ], "Error processing document with tesseract.")
 
     if txt_only:
+        os.unlink(tesseract_source)
         return (None, tesseract_txt)
 
     # create HTML
