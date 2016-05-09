@@ -235,8 +235,7 @@ def archive(pdf, txt, date, tags):
 
 def delete_files(files):
     for file in files:
-        print("Not deleting: %r" % file)
-        #os.unlink(file)
+        os.unlink(file)
 
 
 def main():
