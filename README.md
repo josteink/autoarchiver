@@ -29,6 +29,6 @@ autoarchiver depends on the following software:
 * [Exact-image](http://dl.exactcode.de/oss/exact-image/) (for PDF processing)
 
 Most of these should be available as packages on Debian-based distros,
-but Tesseract may need to be built from source in order to support
+but Tesseract may need to be [built from source](https://github.com/josteink/machine-build/blob/master/profiles/80-documentarchive-deps.conf) in order to support
 HOCR-output used by Exact-image.
 
