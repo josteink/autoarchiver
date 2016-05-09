@@ -239,8 +239,10 @@ def archive(pdf, txt, date, tags):
     print("Archiving to {0}...".format(path))
     # create target dir and archive
     os.makedirs(path)
-    copy(pdf, path)
-    copy(txt, path)
+    tpdf = os.path.join(path, "result.pdf")
+    ttxt = os.path.join(path, "result.txt")
+    copy(pdf, tpdf)
+    copy(txt, ttxt)
 
 
 def delete_files(files):
