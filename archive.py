@@ -88,7 +88,7 @@ def user_confirm(date):
     print("Date {0} detected from scanned document.".format(formatted))
     print("Use this value? [Y/n] ")
     res = input()
-    return res.lower() != "y"
+    return not (res.lower() != "y")
 
 
 def get_date_from_contents(file):
