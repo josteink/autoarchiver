@@ -85,8 +85,8 @@ def format_date(date, seperator="/"):
 
 def user_confirm(date):
     formatted = format_date(date, seperator="-")
-    print "Date {0} detected from scanned document.".format(formatted),
-    print " Use this value? [Y/n]"
+    print("Date {0} detected from scanned document.".format(formatted))
+    print("Use this value? [Y/n] ")
     res = input()
     return res.lower() != "y"
 
