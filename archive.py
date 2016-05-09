@@ -140,6 +140,8 @@ def open_silently(command, error_message, custom_stdin=None):
     if retcode is not 0:
         raise Exception((error_message + ":\n%r") % output)
 
+    return output
+
 
 def scan_document():
     import tempfile
@@ -147,9 +149,13 @@ def scan_document():
     # scan original
     print("Scanning...")
     fid, scanned = tempfile.mkstemp(suffix=".tiff")
-    open_silently([
-        "scanimage", "--resolution=" + str(dpi), "--format=tiff", scanned
+    bytes = open_silently([
+        "scanimage", "--resolution=" + str(dpi), "--format=tiff"
     ], "Error attempting to scan document.")
+
+    with open(scanned, 'wb') as f:
+        f.write(bytes)
+
     return scanned
 
 
