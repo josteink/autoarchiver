@@ -7,11 +7,20 @@ import datetime
 dpi = 300
 basepath = "~/DocumentArchive"
 
+
 def get_date_from_parts(year, month, day):
     [iyear, imonth, iday] = map(int, [
         year, month, day
     ])
     return datetime.datetime(iyear, imonth, iday)
+
+
+def valid_components(year, month, day):
+    try:
+        get_date_from_parts(year, month, day)
+        return True
+    except:
+        return False
 
 
 def get_date_from_string(string):
@@ -31,7 +40,8 @@ def get_date_from_string(string):
     m = date_iso.match(string)
     if m is not None:
         [year, i1, month, i2, day] = m.groups()
-        return get_date_from_parts(year, month, day)
+        if valid_components(year, month, day):
+            return get_date_from_parts(year, month, day)
 
     date_normal = re.compile(
         "^.*" +             # whatever
@@ -43,7 +53,8 @@ def get_date_from_string(string):
     m = date_normal.match(string)
     if m is not None:
         [day, i1, month, i2, year] = m.groups()
-        return get_date_from_parts(year, month, day)
+        if valid_components(year, month, day):
+            return get_date_from_parts(year, month, day)
 
     date_no_year = re.compile(
         "^.*" +             # whatever
@@ -55,13 +66,53 @@ def get_date_from_string(string):
     if m is not None:
         [day, i1, month] = m.groups()
         year = datetime.datetime.now().year
-        return get_date_from_parts(year, month, day)
+        if valid_components(year, month, day):
+            return get_date_from_parts(year, month, day)
 
     return None
 
 
 def get_tags(tags):
     return tags or ["Ukategorisert"]
+
+
+def format_date(date, seperator="/"):
+    formatted = "{0}{3}{1:02d}{3}{2:02d}".format(
+        date.year, date.month, date.day, seperator
+    )
+    return formatted
+
+
+def user_confirm(date):
+    formatted = format_date(date, seperator="-")
+    print "Date {0} detected from scanned document.".format(formatted),
+    print " Use this value? [Y/n]"
+    res = input()
+    return res.lower() != "y"
+
+
+def get_date_from_contents(file):
+    with open(file, 'r') as f:
+        contents = f.read()
+        lines = contents.split("\n")
+        for line in lines:
+            # print "Processing: %r" % line
+            res = get_date_from_string(line)
+            if res and user_confirm(res):
+                return res
+        return None
+
+
+def get_date_modified(filename):
+    t = os.path.getmtime(filename)
+    return datetime.datetime.fromtimestamp(t)
+
+
+def get_date_for_file(pdf, txt):
+    date = get_date_from_contents(txt) \
+           or get_date_modified(pdf)
+
+    return date
 
 
 def open_silently(command, error_message, custom_stdin=None):
@@ -109,7 +160,7 @@ def ocr_document(source, txt_only=False):
     # preprocess for OCR
     tesseract_source = temp_base + ".tiff"
     open_silently([
-        "convert", "-quiet", "-density", dpi, "-depth", "8",
+        "convert", "-quiet", "-density", str(dpi), "-depth", "8",
         "-colorspace", "Gray",
         # avoid alpha channel. required so that processed PDFs can be
         # processed by leptonica and tesseract.
@@ -155,7 +206,10 @@ def ocr_document(source, txt_only=False):
 def archive(pdf, txt, date, tags):
     from shutil import copy
 
-    print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, tags))
+    if date is None:
+        date = get_date_for_file(pdf, txt)
+
+    # print("PDF: %r\nTXT: %r\nDate: %r\nArgs: %r" % (pdf, txt, date, tags))
 
     date_part = "{0}/{1:02d}/{2:02d}".format(
         date.year, date.month, date.day
@@ -172,6 +226,7 @@ def archive(pdf, txt, date, tags):
                 break
             num += 1
 
+    print("Archiving to {0}...".format(path))
     # create target dir and archive
     os.makedirs(path)
     copy(pdf, path)

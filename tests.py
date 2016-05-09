@@ -19,3 +19,12 @@ class Tests(unittest.TestCase):
         for testcase in testcases:
             result = archive.get_date_from_string(testcase)
             self.assertEqual(expected, result)
+
+    def test_parse_difficult_dates(self):
+        from datetime import datetime
+
+        testcase = "hjghkjd 13022016 fshdfhkds"
+        expected = datetime(2016, 2, 13)
+
+        result = archive.get_date_from_string(testcase)
+        self.assertEqual(expected, result)
