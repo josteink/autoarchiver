@@ -24,6 +24,7 @@ autoarchiver depends on the following software:
 
 * Python3 (standard modules only)
 * [SANE/XSANE](http://xsane.org/) (for scanning)
+* [ImageMagick](http://www.imagemagick.org/script/index.php) (for OCR pre-processing)
 * [Tesseract](https://github.com/tesseract-ocr/tesserac) & [Leptonica](http://www.leptonica.org/) (for OCR)
 * [Exact-image](http://dl.exactcode.de/oss/exact-image/) (for PDF processing)
 
