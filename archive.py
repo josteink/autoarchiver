@@ -19,7 +19,7 @@ def valid_components(year, month, day):
     try:
         date = get_date_from_parts(year, month, day)
         return (date.year > 1970
-                and not date.year > datetime.datetime.now().year)
+                and not date > datetime.datetime.now())
     except:
         return False
 
