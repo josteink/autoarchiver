@@ -22,11 +22,13 @@ Main features:
 
 autoarchiver depends on the following software:
 
-* Python3 (standard modules only)
+* Python3 (only standard modules required)
+* [Scikit-learn](http://scikit-learn.org/stable/index.html) (for machine-learning analysis)
 * [SANE/XSANE](http://xsane.org/) (for scanning)
 * [ImageMagick](http://www.imagemagick.org/script/index.php) (for OCR pre-processing)
 * [Tesseract](https://github.com/tesseract-ocr/tesserac) & [Leptonica](http://www.leptonica.org/) (for OCR)
-* [Exact-image](http://dl.exactcode.de/oss/exact-image/) (for PDF processing)
+* [Exact-image](http://dl.exactcode.de/oss/exact-image/) (for PDF
+  processing)
 
 Most of these should be available as packages on Debian-based distros,
 but Tesseract may need to be [built from source](https://github.com/josteink/machine-build/blob/master/profiles/80-documentarchive-deps.conf) in order to support
