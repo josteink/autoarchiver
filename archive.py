@@ -13,13 +13,13 @@ def get_date_from_parts(year, month, day):
     [iyear, imonth, iday] = map(int, [
         year, month, day
     ])
-    return datetime.datetime(iyear, imonth, iday)
+    return datetime.date(iyear, imonth, iday)
 
 
 def get_validated_date(year, month, day):
     try:
         date = get_date_from_parts(year, month, day)
-        is_ok = (date.year > 1970 and not date > datetime.datetime.now())
+        is_ok = (date.year > 1970 and not date > datetime.date.today())
         if is_ok:
             return date
 
@@ -80,7 +80,7 @@ def get_date_from_string(string):
     m = date_no_year.match(string)
     if m is not None:
         [i0, i01, day, i1, month, i2] = m.groups()
-        year = datetime.datetime.now().year
+        year = datetime.date.today().year
         date = get_validated_date(year, month, day)
         if date:
             return date
@@ -144,7 +144,7 @@ def get_date_from_contents(file):
 
 def get_date_modified(filename):
     t = os.path.getmtime(filename)
-    return datetime.datetime.fromtimestamp(t)
+    return datetime.date.fromtimestamp(t)
 
 
 def get_date_for_file(pdf, txt):
