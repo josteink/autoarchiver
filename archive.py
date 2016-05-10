@@ -84,24 +84,47 @@ def format_date(date, seperator="/"):
     return formatted
 
 
-def user_confirm(date):
+def user_confirm(date, lines):
     formatted = format_date(date, seperator="-")
-    print("Date {0} detected from scanned document.".format(formatted))
+    print("Date {0} found in the following lines:".format(formatted))
+    for line in lines:
+        print("- {0}".format(line))
+
     print("Use this value? [Y/n] ")
     res = input()
     return (res is '') or (res.lower() == "y")
 
 
-def get_date_from_contents(file):
+def get_dates_from_contents(file):
     with open(file, 'r') as f:
         contents = f.read()
         lines = contents.split("\n")
+
+        dates = {}
         for line in lines:
-            # print "Processing: %r" % line
-            res = get_date_from_string(line)
-            if res and user_confirm(res):
-                return res
-        return None
+            date = get_date_from_string(line)
+            if not date:
+                continue
+
+            if date not in dates:
+                dates[date] = []
+
+            dates[date].append(line)
+
+        return dates
+
+
+def get_date_from_contents(file):
+    dates = get_dates_from_contents(file)
+
+    if len(dates) == 1:
+        return dates.keys()[0]
+
+    for date, lines in reversed(sorted(dates.items())):
+        if user_confirm(date, lines):
+            return date
+
+    return None
 
 
 def get_date_modified(filename):
