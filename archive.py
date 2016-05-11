@@ -30,42 +30,42 @@ def get_date_from_string(string):
     if string is None:
         return None
 
-    sep = "(_|-|\\.|\\:|\\/)?"
+    sep = "(_|-|\\.|\\:|\\/| )?"
     date_iso = re.compile(
-        "^.*" +             # whatever
-        "(\\d{4})" + sep +  # year 1
-        "(\\d{2})" + sep +  # month 3
-        "(\\d{2})" +        # day 5
-        ".*$"               # whatever
+        "^.*" +               # whatever
+        "(\\d{4})" + sep +    # year 1
+        "(\\d{2})" + "\\2" +  # month 3
+        "(\\d{2})" + sep +    # day 4
+        ".*$"                 # whatever
     )
     m = date_iso.match(string)
     if m is not None:
-        [year, i1, month, i2, day] = m.groups()
         if valid_components(year, month, day):
             return get_date_from_parts(year, month, day)
+        [year, i1, month, day, i2] = m.groups()
 
     date_normal = re.compile(
-        "^.*" +             # whatever
-        "(\\d{2})" + sep +  # day 1
-        "(\\d{2})" + sep +  # month 3
-        "(\\d{4})" +        # year 5
-        ".*$"               # whatever
+        "^.*" +               # whatever
+        "(\\d{2})" + sep +    # day 1
+        "(\\d{2})" + "\\2" +  # month 3
+        "(\\d{4})" + sep +    # year 4
+        ".*$"                 # whatever
     )
     m = date_normal.match(string)
     if m is not None:
-        [day, i1, month, i2, year] = m.groups()
         if valid_components(year, month, day):
             return get_date_from_parts(year, month, day)
+        [day, i1, month, year, i2] = m.groups()
 
     date_no_year = re.compile(
-        "^.*" +             # whatever
-        "(\\d{2})" + sep +  # day 1
-        "(\\d{2})"          # month 3
-        ".*$"               # whatever
+        "^(.*[^\\d]+)?" + sep +  # whatever
+        "(\\d{2})" + sep +       # day 1
+        "(\\d{2})" + sep +       # month 3
+        ".*$"                    # whatever
     )
     m = date_no_year.match(string)
     if m is not None:
-        [day, i1, month] = m.groups()
+        [i0, i01, day, i1, month, i2] = m.groups()
         year = datetime.datetime.now().year
         if valid_components(year, month, day):
             return get_date_from_parts(year, month, day)
