@@ -2,6 +2,7 @@
 
 import os
 import datetime
+import re
 
 # settings
 dpi = 300
@@ -15,60 +16,74 @@ def get_date_from_parts(year, month, day):
     return datetime.datetime(iyear, imonth, iday)
 
 
-def valid_components(year, month, day):
+def get_validated_date(year, month, day):
     try:
         date = get_date_from_parts(year, month, day)
-        return (date.year > 1970
-                and not date > datetime.datetime.now())
+        is_ok = (date.year > 1970 and not date > datetime.datetime.now())
+        if is_ok:
+            return date
+
     except:
-        return False
+        return None
+
+    return None
+
+#
+# date regexps
+# pre-compiled for better performance when generating training-data
+# for ML.
+#
+
+sep = "(_|-|\\.|\\:|\\/| )?"
+date_iso = re.compile(
+    "^.*" +               # whatever
+    "(\\d{4})" + sep +    # year 1
+    "(\\d{2})" + "\\2" +  # month 3
+    "(\\d{2})" + sep +    # day 4
+    ".*$"                 # whatever
+)
+
+date_normal = re.compile(
+    "^.*" +               # whatever
+    "(\\d{2})" + sep +    # day 1
+    "(\\d{2})" + "\\2" +  # month 3
+    "(\\d{4})" + sep +    # year 4
+    ".*$"                 # whatever
+)
+
+date_no_year = re.compile(
+    "^(.*[^\\d]+)?" + sep +  # whatever
+    "(\\d{2})" + sep +       # day 1
+    "(\\d{2})" + sep +       # month 3
+    ".*$"                    # whatever
+)
 
 
 def get_date_from_string(string):
-    import re
-
     if string is None:
         return None
 
-    sep = "(_|-|\\.|\\:|\\/| )?"
-    date_iso = re.compile(
-        "^.*" +               # whatever
-        "(\\d{4})" + sep +    # year 1
-        "(\\d{2})" + "\\2" +  # month 3
-        "(\\d{2})" + sep +    # day 4
-        ".*$"                 # whatever
-    )
     m = date_iso.match(string)
     if m is not None:
-        if valid_components(year, month, day):
-            return get_date_from_parts(year, month, day)
         [year, i1, month, day, i2] = m.groups()
+        date = get_validated_date(year, month, day)
+        if date:
+            return date
 
-    date_normal = re.compile(
-        "^.*" +               # whatever
-        "(\\d{2})" + sep +    # day 1
-        "(\\d{2})" + "\\2" +  # month 3
-        "(\\d{4})" + sep +    # year 4
-        ".*$"                 # whatever
-    )
     m = date_normal.match(string)
     if m is not None:
-        if valid_components(year, month, day):
-            return get_date_from_parts(year, month, day)
         [day, i1, month, year, i2] = m.groups()
+        date = get_validated_date(year, month, day)
+        if date:
+            return date
 
-    date_no_year = re.compile(
-        "^(.*[^\\d]+)?" + sep +  # whatever
-        "(\\d{2})" + sep +       # day 1
-        "(\\d{2})" + sep +       # month 3
-        ".*$"                    # whatever
-    )
     m = date_no_year.match(string)
     if m is not None:
         [i0, i01, day, i1, month, i2] = m.groups()
         year = datetime.datetime.now().year
-        if valid_components(year, month, day):
-            return get_date_from_parts(year, month, day)
+        date = get_validated_date(year, month, day)
+        if date:
+            return date
 
     return None
 
