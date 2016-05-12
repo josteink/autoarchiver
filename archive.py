@@ -99,15 +99,21 @@ def format_date(date, seperator="/"):
     return formatted
 
 
-def user_confirm(date, lines):
-    formatted = format_date(date, seperator="-")
-    print("Date {0} found in the following lines:".format(formatted))
-    for line in lines:
-        print("- {0}".format(line))
+def get_user_choice(values, default):
+    while True:
+        result = input("Please input a value between {0} and {1}. Default = {2}: ".format(
+            min(values), max(values), default
+        ))
 
-    print("Use this value? [Y/n] ")
-    res = input()
-    return (res is '') or (res.lower() == "y")
+        if result == '':
+            result = default
+
+        try:
+            value = int(result)
+            if value in values:
+                return value
+        except:
+            continue
 
 
 def get_dates_from_contents(file):
@@ -132,14 +138,25 @@ def get_dates_from_contents(file):
 def get_date_from_contents(file):
     dates = get_dates_from_contents(file)
 
+    if len(dates) == 0:
+        return None
+
     if len(dates) == 1:
         return dates.keys()[0]
 
-    for date, lines in reversed(sorted(dates.items())):
-        if user_confirm(date, lines):
-            return date
+    print("Found {0} dates in document.\n".format(len(dates)))
 
-    return None
+    count = 1
+    for date, lines in sorted(dates.items()):
+        print("{0}: {1}:".format(count, format_date(date)))
+        for line in lines:
+            print("- {0}".format(line))
+        print("")
+        count += 1
+
+    choice = get_user_choice(range(1, count), 1)
+    date = sorted(dates.keys())[choice - 1]
+    return date
 
 
 def get_date_modified(filename):
