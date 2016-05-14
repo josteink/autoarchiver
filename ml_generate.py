@@ -24,14 +24,14 @@ def format_ml_record(path, dates, actual_date, date_out):
         res = "NONE"
         if date_out:
             return [
-                path,
+                path, actual_date,
                 None, 0, None, 0, None, 0,
                 res
             ]
         else:
             no_date = -1000000
             return [
-                path,
+                path, actual_date,
                 no_date, 0, no_date, 0, no_date, 0,
                 res
             ]
@@ -60,13 +60,13 @@ def format_ml_record(path, dates, actual_date, date_out):
 
     if date_out:
         return [
-            path,
+            path, actual_date,
             min_date, min_freq, mid_date, mid_freq, max_date, max_freq,
             res
         ]
     else:
         return [
-            path,
+            path, actual_date,
             min_adj, min_freq, mid_adj, mid_freq, max_adj, max_freq,
             res
         ]
@@ -76,7 +76,9 @@ def create_ml_record_for(path, date_out):
     """Creates a ML record for the given contents."""
 
     dates = archive.get_dates_from_contents(path)
-    date_actual = archive.get_date_from_string(path)
+    date_actual = (archive.get_date_from_string(path) or
+                   # for new result.txt-files from /tmp/
+                   archive.get_date_modified(path))
 
     return format_ml_record(path, dates, date_actual, date_out)
 
@@ -91,6 +93,50 @@ def create_dataset_for(path, date_out=False):
                 res = create_ml_record_for(fullpath, date_out)
                 data.append(res)
     return data
+
+
+def classify_record(record):
+    """Manually created classification function based on DT output."""
+
+    min_date, mid_date, max_date = record[0:5:2]
+    NONE, MIN, MID, MAX = ["NONE", "MIN", "MID", "MAX"]
+
+    if max_date <= -0.5:
+        return NONE
+
+    if max_date <= 0.5:
+        return MAX
+
+    if min_date > 0.5:
+        return NONE
+
+    if min_date > -0.5:
+        return MIN
+
+    if mid_date > 1.0:
+        return NONE
+
+    if mid_date <= -4.5:
+        return NONE
+
+    return MID
+
+
+def determine_date(path):
+    record_no_dates = create_ml_record_for(path, False)
+    record_dates = create_ml_record_for(path, True)
+
+    result = classify_record(record_no_dates[2:])
+    if result == "NONE":
+        return None
+    elif result == "MIN":
+        return record_dates[2]
+    elif result == "MID":
+        return record_dates[4]
+    elif result == "MAX":
+        return record_dates[6]
+    else:
+        raise Exception("Unrecognized record-classification: " + result)
 
 
 def generate_model_for(path, test_items, model_file):
@@ -110,7 +156,7 @@ def generate_model_for(path, test_items, model_file):
     validation_labels = []
 
     for item in dataset:
-        feature = item[1:-1]
+        feature = item[2:-1]
         label = item[-1]
 
         # is validation item
@@ -137,16 +183,15 @@ def generate_model_for(path, test_items, model_file):
             failed = True
             print("Validation failed! Expected: %r. Actual: %r" % (label, res))
 
-    # extra sanity checking
-    print("Sanity-checking with {0} records.".format(len(training_features)))
-    results = clf.predict(training_features)
-    for i in range(0, len(training_features)):
-        label = training_labels[i]
+    print("Validating manual implementation.")
+    for i in range(0, len(validation_features)):
+        features = validation_features[i]
+        label = validation_labels[i]
 
-        res = results[i]
+        res = classify_record(features)
         if res != label:
             failed = True
-            print("Sanity-checking failed! Expected: %r. Actual: %r" % (label, res))
+            print("Validation failed! Expected: %r. Actual: %r" % (label, res))
 
     if failed:
         print("Validation failed. Not exporting model!")

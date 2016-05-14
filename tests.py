@@ -44,14 +44,18 @@ class Tests(unittest.TestCase):
 
     def test_parse_path_as_date(self):
         testcase = "/home/jostein/DocumentArchive/2012/01/28/hp photosmart 5510 5515 all in one printer ink/result.txt"
-        expected = date(2012,1,28)
+        expected = date(2012, 1, 28)
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
     def test_ml_implementation(self):
         import ml_generate
-        testcase = u"/home/jostein/DocumentArchive/2013/04/19/kvittering kjøp linser bjølsen optikk/result.txt"
-        expected = date(2013,4,19)
+        import os
+        print(os.path.curdir)
+        # having date in filename aids creating "decent" relative
+        # time-offsets to content
+        testcase = "./test-data/ml_validation_2013_04_19.txt"
+        expected = date(2013, 4, 19)
         result = ml_generate.determine_date(testcase)
         self.assertEqual(expected, result)
 
