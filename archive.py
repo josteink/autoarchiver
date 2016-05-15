@@ -174,21 +174,52 @@ def get_dates_from_contents(file):
         return dates
 
 
+def this_year(dates, today=None):
+    if today is None:
+        today = datetime.date.today()
+
+    def my_filter(d):
+        return d.year == today.year
+    result = filter(my_filter, dates)
+    return result
+
+
+def past_month(dates, today=None):
+    if today is None:
+        today = datetime.date.today()
+
+    def my_filter(d):
+        # diff is of type timedelta
+        days = (today-d).days
+        return -31 < days and days <= 0
+    result = filter(my_filter, dates)
+    return result
+
+
 def get_date_from_contents(file):
-    dates = get_dates_from_contents(file)
+    entries = get_dates_from_contents(file)
+    dates = list(sorted(entries.keys()))
 
     if len(dates) == 0:
         return None
 
+    res = None
     if len(dates) == 1:
-        res = list(dates.keys())[0]
+        res = dates[0]
+    elif len(past_month(dates)) == 1:
+        res = past_month(dates)[0]
+    elif len(this_year(dates)) == 1:
+        res = this_year(dates)[0]
+
+    if res:
         print("Found one date (%r) in document. Using it automatically." % res)
         return res
 
     print("Found {0} dates in document.\n".format(len(dates)))
 
     count = 1
-    for date, lines in sorted(dates.items()):
+    for date in dates:
+        lines = entries[date]
         print("{0}: {1}:".format(count, format_date(date)))
         for line in lines:
             print("- {0}".format(line))
@@ -196,7 +227,7 @@ def get_date_from_contents(file):
         count += 1
 
     choice = get_user_choice(range(1, count), 1)
-    date = sorted(dates.keys())[choice - 1]
+    date = dates[choice - 1]
     return date
 
 
