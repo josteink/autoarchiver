@@ -181,7 +181,9 @@ def get_date_from_contents(file):
         return None
 
     if len(dates) == 1:
-        return dates.keys()[0]
+        res = list(dates.keys())[0]
+        print("Found one date (%r) in document. Using it automatically." % res)
+        return res
 
     print("Found {0} dates in document.\n".format(len(dates)))
 
