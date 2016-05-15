@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
-        testcase = "Legge 30/11/1991 11.413-0.1.1. 30-3~1<192ﬁ0.izR.11-11-1005 11.000  N _,"
+        testcase = "Legge 30/11/1991 11.413-0.1.1. 30-3~1<192ﬁ0.izR.11-11-105 11.000  N _,"
         expected = date(1991, 11, 30)
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)

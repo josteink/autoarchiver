@@ -30,92 +30,61 @@ def get_validated_date(year, month, day):
 
 
 def get_date_from_string(string, allow_no_year=False):
-    # parse with and without space as allowed separator,
-    # but always try all cases without space first!
-    # avoid cases like ref 12/04/2014 12 23 parsed as 2014/12/23.
-    sep1 = "(_|-|\\.|\\:|\\/)?"
-    sep2 = "( )?"
-    sep = "%S"
-
-    def re_compile(fmt):
-        rx1 = re.compile(fmt.replace(sep, sep1))
-        rx2 = re.compile(fmt.replace(sep, sep2))
-        return (rx1, rx2)
-
     if string is None:
         return None
 
-    #
-    # first run: no whitespace as separator
-    #
-    date_iso1, date_iso2 = re_compile(
-        "^.*" +               # whatever
-        "(\\d{4})" + sep +    # year 1
-        "(\\d{2})" + "\\2" +  # month 3
-        "(\\d{2})" + sep +    # day 4
-        ".*$"                 # whatever
-    )
-    m = date_iso1.match(string)
-    if m is not None:
-        [year, i1, month, day, i2] = m.groups()
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
+    # parse with and without space as allowed separator,
+    # but always try all cases without space first!
+    # avoid cases like ref 12/04/2014 12 23 parsed as 2014/12/23.
+    seps = [
+        "(_|-|\\.|\\:|\\/)?",
+        "( )?",
+        "()?"  # stupid thing to match blanks
+    ]
 
-    date_normal1, date_normal2 = re_compile(
-        "^.*" +               # whatever
-        "(\\d{2})" + sep +    # day 1
-        "(\\d{2})" + "\\2" +  # month 3
-        "(\\d{4})" + sep +    # year 4
-        ".*$"                 # whatever
-    )
-    m = date_normal1.match(string)
-    if m is not None:
-        [day, i1, month, year, i2] = m.groups()
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
-
-    date_no_year1, date_no_year2 = re_compile(
-        "^(.*[^\\d]+)?" + sep +  # whatever
-        "(\\d{2})" + sep +       # day 1
-        "(\\d{2})" + sep +       # month 3
-        ".*$"                    # whatever
-    )
-    if allow_no_year:
-        m = date_no_year1.match(string)
+    for sep in seps:
+        date_iso = re.compile(
+            "^.*" +               # whatever
+            "(\\d{4})" + sep +    # year 1
+            "(\\d{2})" + "\\2" +  # month 3
+            "(\\d{2})" + sep +    # day 4
+            ".*$"                 # whatever
+        )
+        m = date_iso.match(string)
         if m is not None:
-            [i0, i01, day, i1, month, i2] = m.groups()
-            year = datetime.date.today().year
+            [year, i1, month, day, i2] = m.groups()
             date = get_validated_date(year, month, day)
             if date:
                 return date
 
-    #
-    # second run: with whitespace as separator
-    #
-    m = date_iso2.match(string)
-    if m is not None:
-        [year, i1, month, day, i2] = m.groups()
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
-
-    m = date_normal2.match(string)
-    if m is not None:
-        [day, i1, month, year, i2] = m.groups()
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
-
-    if allow_no_year:
-        m = date_no_year2.match(string)
+        date_normal = re.compile(
+            "^.*" +               # whatever
+            "(\\d{2})" + sep +    # day 1
+            "(\\d{2})" + "\\2" +  # month 3
+            "(\\d{4})" + sep +    # year 4
+            ".*$"                 # whatever
+        )
+        m = date_normal.match(string)
         if m is not None:
-            [i0, i01, day, i1, month, i2] = m.groups()
-            year = datetime.date.today().year
+            [day, i1, month, year, i2] = m.groups()
             date = get_validated_date(year, month, day)
             if date:
                 return date
+
+        if allow_no_year:
+            date_no_year = re.compile(
+                "^(.*[^\\d]+)?" + sep +  # whatever
+                "(\\d{2})" + sep +       # day 1
+                "(\\d{2})" + sep +       # month 3
+                ".*$"                    # whatever
+            )
+            m = date_no_year.match(string)
+            if m is not None:
+                [i0, i01, day, i1, month, i2] = m.groups()
+                year = datetime.date.today().year
+                date = get_validated_date(year, month, day)
+                if date:
+                    return date
 
     return None
 
