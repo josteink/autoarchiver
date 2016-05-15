@@ -23,7 +23,6 @@ Main features:
 autoarchiver depends on the following software:
 
 * Python3 (only standard modules required)
-* [Scikit-learn](http://scikit-learn.org/stable/index.html) (for machine-learning analysis)
 * [SANE/XSANE](http://xsane.org/) (for scanning)
 * [ImageMagick](http://www.imagemagick.org/script/index.php) (for OCR pre-processing)
 * [Tesseract](https://github.com/tesseract-ocr/tesserac) & [Leptonica](http://www.leptonica.org/) (for OCR)

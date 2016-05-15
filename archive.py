@@ -28,55 +28,33 @@ def get_validated_date(year, month, day):
 
     return None
 
-#
-# date regexps
-# pre-compiled for better performance when generating training-data
-# for ML.
-#
-
-# parse with and without space as allowed separator,
-# but always try all cases without space first!
-# avoid cases like ref 12/04/2014 12 23 parsed as 2014/12/23.
-sep1 = "(_|-|\\.|\\:|\\/)?"
-sep2 = "( )?"
-
-
-def re_compile(fmt):
-    rx1 = re.compile(fmt.replace("%S", sep1))
-    rx2 = re.compile(fmt.replace("%S", sep2))
-    return (rx1, rx2)
-
-
-sep = "%S"
-date_iso1, date_iso2 = re_compile(
-    "^.*" +               # whatever
-    "(\\d{4})" + sep +    # year 1
-    "(\\d{2})" + "\\2" +  # month 3
-    "(\\d{2})" + sep +    # day 4
-    ".*$"                 # whatever
-)
-
-date_normal1, date_normal2 = re_compile(
-    "^.*" +               # whatever
-    "(\\d{2})" + sep +    # day 1
-    "(\\d{2})" + "\\2" +  # month 3
-    "(\\d{4})" + sep +    # year 4
-    ".*$"                 # whatever
-)
-
-date_no_year1, date_no_year2 = re_compile(
-    "^(.*[^\\d]+)?" + sep +  # whatever
-    "(\\d{2})" + sep +       # day 1
-    "(\\d{2})" + sep +       # month 3
-    ".*$"                    # whatever
-)
-
 
 def get_date_from_string(string, allow_no_year=False):
+    # parse with and without space as allowed separator,
+    # but always try all cases without space first!
+    # avoid cases like ref 12/04/2014 12 23 parsed as 2014/12/23.
+    sep1 = "(_|-|\\.|\\:|\\/)?"
+    sep2 = "( )?"
+    sep = "%S"
+
+    def re_compile(fmt):
+        rx1 = re.compile(fmt.replace(sep, sep1))
+        rx2 = re.compile(fmt.replace(sep, sep2))
+        return (rx1, rx2)
+
     if string is None:
         return None
 
-    # no whitespace as separator
+    #
+    # first run: no whitespace as separator
+    #
+    date_iso1, date_iso2 = re_compile(
+        "^.*" +               # whatever
+        "(\\d{4})" + sep +    # year 1
+        "(\\d{2})" + "\\2" +  # month 3
+        "(\\d{2})" + sep +    # day 4
+        ".*$"                 # whatever
+    )
     m = date_iso1.match(string)
     if m is not None:
         [year, i1, month, day, i2] = m.groups()
@@ -84,6 +62,13 @@ def get_date_from_string(string, allow_no_year=False):
         if date:
             return date
 
+    date_normal1, date_normal2 = re_compile(
+        "^.*" +               # whatever
+        "(\\d{2})" + sep +    # day 1
+        "(\\d{2})" + "\\2" +  # month 3
+        "(\\d{4})" + sep +    # year 4
+        ".*$"                 # whatever
+    )
     m = date_normal1.match(string)
     if m is not None:
         [day, i1, month, year, i2] = m.groups()
@@ -91,6 +76,12 @@ def get_date_from_string(string, allow_no_year=False):
         if date:
             return date
 
+    date_no_year1, date_no_year2 = re_compile(
+        "^(.*[^\\d]+)?" + sep +  # whatever
+        "(\\d{2})" + sep +       # day 1
+        "(\\d{2})" + sep +       # month 3
+        ".*$"                    # whatever
+    )
     if allow_no_year:
         m = date_no_year1.match(string)
         if m is not None:
@@ -100,7 +91,9 @@ def get_date_from_string(string, allow_no_year=False):
             if date:
                 return date
 
-    # with whitespace as separator
+    #
+    # second run: with whitespace as separator
+    #
     m = date_iso2.match(string)
     if m is not None:
         [year, i1, month, day, i2] = m.groups()

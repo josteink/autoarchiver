@@ -51,17 +51,6 @@ class Tests(unittest.TestCase):
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
-    def test_ml_implementation(self):
-        import ml_generate
-        import os
-        print(os.path.curdir)
-        # having date in filename aids creating "decent" relative
-        # time-offsets to content
-        testcase = "./test-data/ml_validation_2013_04_19.txt"
-        expected = date(2013, 4, 19)
-        result = ml_generate.determine_date(testcase)
-        self.assertEqual(expected, result)
-
 
 if __name__ == "__main__":
     unittest.main()
