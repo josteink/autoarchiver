@@ -208,9 +208,7 @@ def generate_model_for(path, test_items, model_file):
                              "file_date", "file_abs_date",
                              "actual_date"
                          ],
-                         class_names=[
-                             "MAX", "MID", "MIN", "NONE"
-                         ],
+                         class_names=list(sorted(list(set(training_labels)))),
                          filled=True, rounded=True,
                          impurity=False)
     graph = pydot.graph_from_dot_data(dot_data.getvalue())
