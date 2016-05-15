@@ -19,7 +19,7 @@ class Tests(unittest.TestCase):
         ]
 
         for testcase in testcases:
-            result = archive.get_date_from_string(testcase)
+            result = archive.get_date_from_string(testcase, allow_no_year=True)
             self.assertEqual(expected, result)
 
     def test_parse_difficult_dates(self):
@@ -32,8 +32,11 @@ class Tests(unittest.TestCase):
         testcase = "19/04/2013 12 15"
         expected = date(2013, 4, 19)
         result = archive.get_date_from_string(testcase)
-        # not_expected = date(2013, 12, 15)
-        # self.assertUnequal(not_expected, result)
+        self.assertEqual(expected, result)
+
+        testcase = "Legge 30/11/1991 11.413-0.1.1. 30-3~1<192ﬁ0.izR.11-11-1005 11.000  N _,"
+        expected = date(1991, 11, 30)
+        result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
     def test_parse_non_date(self):

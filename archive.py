@@ -72,7 +72,7 @@ date_no_year1, date_no_year2 = re_compile(
 )
 
 
-def get_date_from_string(string):
+def get_date_from_string(string, allow_no_year=False):
     if string is None:
         return None
 
@@ -91,13 +91,14 @@ def get_date_from_string(string):
         if date:
             return date
 
-    m = date_no_year1.match(string)
-    if m is not None:
-        [i0, i01, day, i1, month, i2] = m.groups()
-        year = datetime.date.today().year
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
+    if allow_no_year:
+        m = date_no_year1.match(string)
+        if m is not None:
+            [i0, i01, day, i1, month, i2] = m.groups()
+            year = datetime.date.today().year
+            date = get_validated_date(year, month, day)
+            if date:
+                return date
 
     # with whitespace as separator
     m = date_iso2.match(string)
@@ -114,13 +115,14 @@ def get_date_from_string(string):
         if date:
             return date
 
-    m = date_no_year2.match(string)
-    if m is not None:
-        [i0, i01, day, i1, month, i2] = m.groups()
-        year = datetime.date.today().year
-        date = get_validated_date(year, month, day)
-        if date:
-            return date
+    if allow_no_year:
+        m = date_no_year2.match(string)
+        if m is not None:
+            [i0, i01, day, i1, month, i2] = m.groups()
+            year = datetime.date.today().year
+            date = get_validated_date(year, month, day)
+            if date:
+                return date
 
     return None
 
@@ -352,7 +354,7 @@ def main():
 
     args = p.parse_args()
 
-    date = get_date_from_string(args.date)
+    date = get_date_from_string(args.date, allow_no_year=True)
     tags = get_tags(args.tags)
     filename = args.file
 
