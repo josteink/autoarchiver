@@ -152,7 +152,7 @@ def past_month(dates, today=None):
 
     def my_filter(d):
         # diff is of type timedelta
-        days = (today-d).days
+        days = (d-today).days
         return -31 < days and days <= 0
     result = filter(my_filter, dates)
     return result
