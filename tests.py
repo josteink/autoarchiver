@@ -51,6 +51,20 @@ class Tests(unittest.TestCase):
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
+    def test_filter_past_dates(self):
+        today = date(2016, 8, 1)
+        tomorrow = date(2016, 8, 2)
+        past_month = date(2016, 7, 15)
+        past_past_month = date(2016, 6, 15)
+
+        def is_past_month(date):
+            results = archive.past_month([date], today=today)
+            return len(results) == 1
+
+        self.assertEqual(False, tomorrow)
+        self.assertEqual(True,  past_month)
+        self.assertEqual(False, past_past_month)
+
 
 if __name__ == "__main__":
     unittest.main()
