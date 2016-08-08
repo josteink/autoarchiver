@@ -142,7 +142,7 @@ def this_year(dates, today=None):
 
     def my_filter(d):
         return d.year == today.year
-    result = filter(my_filter, dates)
+    result = list(filter(my_filter, dates))
     return result
 
 
@@ -154,7 +154,7 @@ def past_month(dates, today=None):
         # diff is of type timedelta
         days = (d-today).days
         return -31 < days and days <= 0
-    result = filter(my_filter, dates)
+    result = list(filter(my_filter, dates))
     return result
 
 

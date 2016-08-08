@@ -61,9 +61,15 @@ class Tests(unittest.TestCase):
             results = archive.past_month([date], today=today)
             return len(results) == 1
 
-        self.assertEqual(False, tomorrow)
-        self.assertEqual(True,  past_month)
-        self.assertEqual(False, past_past_month)
+        self.assertEqual(False, is_past_month(tomorrow))
+        self.assertEqual(True,  is_past_month(past_month))
+        self.assertEqual(False, is_past_month(past_past_month))
+
+    def test_past_month_returns_list(self):
+        today = date(2016, 8, 1)
+        dates = [date(2016, 7, 15)]
+        result = archive.past_month(dates, today=today)
+        self.assertTrue(isinstance(result, list))
 
 
 if __name__ == "__main__":
