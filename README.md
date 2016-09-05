@@ -72,20 +72,21 @@ optional arguments:
 Archived documents will be stored in `$HOME/DocumentArchive` sorted on
 date, and stored with tags.
 
+Both a plain-text OCRed representation (easily searched by `grep`) and
+a PDF containing the originally scanned document merged with the OCRed
+data will be available in a per-archived document folder.
+
 Date will be attempted detected from the document. Overriding
 detection can be done from the command-line. You can use as minimal
 syntax as possible "31-12" will be interpreted as December 31th, this
 year. Etc.
 
-Both a plain-text OCRed representation (easily searched by `grep`) and
-a PDF containing the originally scanned document merged with the OCRed
-data will be available in a per-archived document folder.
+## searching/querying
 
-This means you can easily identity documents based either on the tags
-used to archive it, the period it was archived or the content of the
-scanned document using standard Linux command-line tools like `find`
-and `grep`.
+Based on the filesystem layout you can easily identity documents based
+either on the tags used to archive it, the period it was archived or
+the content of the scanned document using standard Linux command-line
+tools like `find` and `grep`.
 
 A simple tool for these kind of queries is included in the form of a
 shell-script called [da-search](da-search.sh).
-
