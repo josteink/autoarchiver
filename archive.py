@@ -343,7 +343,7 @@ def delete_files(files):
 def main():
     from argparse import ArgumentParser
     p = ArgumentParser()
-    p.add_argument("--date", "-d", help="Date of the archived document.")
+    p.add_argument("--date", "-d", help="Date of the archived document. Use when auto-detection fails.")
     p.add_argument("--file", "-f", help="The file to archive. If omitted, document will be retrieved from scanner.")
     p.add_argument("tags", nargs="*", help="The tags to apply to the document.")
 

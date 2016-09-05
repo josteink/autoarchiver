@@ -63,7 +63,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --date DATE, -d DATE  Date of the archived document.
+  --date DATE, -d DATE  Date of the archived document. Use when auto-detection
+                        fails.
   --file FILE, -f FILE  The file to archive. If omitted, document will be
                         retrieved from scanner.
 ````
