@@ -72,6 +72,11 @@ optional arguments:
 Archived documents will be stored in `$HOME/DocumentArchive` sorted on
 date, and stored with tags.
 
+Date will be attempted detected from the document. Overriding
+detection can be done from the command-line. You can use as minimal
+syntax as possible "31-12" will be interpreted as December 31th, this
+year. Etc.
+
 Both a plain-text OCRed representation (easily searched by `grep`) and
 a PDF containing the originally scanned document merged with the OCRed
 data will be available in a per-archived document folder.
