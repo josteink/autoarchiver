@@ -44,7 +44,7 @@ def get_date_from_string(string, allow_no_year=False):
 
     for sep in seps:
         date_iso = re.compile(
-            "^.*" +               # whatever
+            "[^\\d]*" +           # whatever not a number
             "(\\d{4})" + sep +    # year 1
             "(\\d{2})" + "\\2" +  # month 3
             "(\\d{2})" + sep +    # day 4
@@ -58,7 +58,7 @@ def get_date_from_string(string, allow_no_year=False):
                 return date
 
         date_normal = re.compile(
-            "^.*" +               # whatever
+            "[^\\d]*" +           # whatever not a number
             "(\\d{2})" + sep +    # day 1
             "(\\d{2})" + "\\2" +  # month 3
             "(\\d{4})" + sep +    # year 4
