@@ -39,9 +39,15 @@ class Tests(unittest.TestCase):
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
+
     def test_parse_non_date(self):
         # this ended getting parsed as $year-04-23 !!
         testcase = "ART. NR 30011832 22304"
+        result = archive.get_date_from_string(testcase)
+        self.assertEqual(None, result)
+
+        # has been parsed as 2016-09-20...
+        testcase = "N15310: 1424020092016 11:17 (Jrdre nr: 231555"
         result = archive.get_date_from_string(testcase)
         self.assertEqual(None, result)
 
