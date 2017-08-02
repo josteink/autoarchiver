@@ -25,7 +25,6 @@ class Tests(unittest.TestCase):
     def test_parse_difficult_dates(self):
         testcase = "hjghkjd 13012016 fshdfhkds"
         expected = date(2016, 1, 13)
-
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
@@ -39,6 +38,10 @@ class Tests(unittest.TestCase):
         result = archive.get_date_from_string(testcase)
         self.assertEqual(expected, result)
 
+        testcase = "ä Kvitteringnr. 254499 --1 01.07.2017 10320"
+        expected = date(2017, 7, 1)
+        result = archive.get_date_from_string(testcase)
+        self.assertEqual(expected, result)
 
     def test_parse_non_date(self):
         # this ended getting parsed as $year-04-23 !!
