@@ -1,5 +1,5 @@
 
-# autoarchiver [![Build Status](https://travis-ci.org/josteink/autoarchiver.svg?branch=master)](https://travis-ci.org/josteink/autoarchiver)
+# autoarchiver ![CI](https://github.com/josteink/autoarchiver/workflows/CI/badge.svg)
 
 autoarchiver is a scanning, OCRing and archiving-solution built on top
 of various Linux libraries and utilities.
